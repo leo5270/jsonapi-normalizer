@@ -8,6 +8,7 @@ module.exports = function (response) {
   }
 
   const included = response.included || []
+  const meta = response.meta || null
 
   let result = {}
   let entities = {}
@@ -23,7 +24,8 @@ module.exports = function (response) {
 
   return {
     result,
-    entities
+    entities,
+    ...(meta ? {meta: meta} : {})
   }
 }
 
@@ -36,14 +38,15 @@ function addResult (result, entity) {
 }
 
 function addEntity (entities, entity) {
-  const { type, id, attributes } = entity
+  const { type, id, attributes, meta } = entity
 
   if (!entities[type]) entities[type] = {}
 
   entities[type][id] = {
     id,
     ...attributes,
-    ...extractRelationships(entity)
+    ...extractRelationships(entity),
+    ...(meta ? {meta: meta} : {})
   }
 
   return entities
